@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # checks to see if repository is up to date
-# git diff will show the 
 uptodate(){
 	echo " ***** Checking for local/remote updates .. *****"
 	local="$(git diff --name-only | wc -l)"
@@ -27,7 +26,7 @@ uptodate(){
 # reference for git diff :https://stackoverflow.com/questions/35978550/how-to-show-uncommitted-changes-in-git
 uncommitedchanges(){
 	echo " ***** Creating changes.log .. *****"
-	git diff --cached > changes.log
+	git diff --name-status > changes.log
 }
 
 # finds all files with TODO lines and puts the file name and line into todo.log
