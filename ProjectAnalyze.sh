@@ -1,32 +1,46 @@
 #!/bin/bash
 
+#checks to see if repo is up to date 
 uptodate(){
-	echo " ********** Checking if local repo is up to date with the remote repo .. **********"
-	if [$(git diff --name-only | wc -l) -gt "0"]
+	echo " ***** Checking for local/remote updates .. *****"
+	local="$(git diff --name-only | wc -l)" 
+	if [ "$local" -gt 0 ] 
 	then
-		echo " Oh no! Your local repo has files that have not been updated to the remote repo"
+		echo " "
+		echo "Oh no! Your local repo has files that have not been updated to the remote repo: "
+		git diff --name-only
+		echo " "
 	fi
-	if [$(git diff --name-only origin master | wc -l) -gt 0]
+
+        remote="$(git diff --name-only origin master | wc -l)" 
+        if [ "$remote" -gt 0 ] 
 	then
-		echo " Oh no! Your remote repo has files on it that you don't have yet!"
+		echo " "
+		echo "Oh no! Your remote repo has files on it that you don't have yet: "
+		git diff --name-only origin master
+		echo " "
 	fi
 }
 
+# checks for uncommited changes
 uncommitedchanges(){
-	echo " ********** Putting all uncommited changes into changes.log .. **********"
-	git diff --name-status > changes.log
+	echo " ***** Creating changes.log .. *****"
+	git diff --name-status > changes.log 
 }
 
+# finds all files with TODO lines and puts the file name and line into todo.log
 findtodo(){
-	echo " ***** Finding all the files with #TODO lines and putting into todo.log .. **********"
-	grep -r "#TODO" --exclude=todo.log > todo.log
+	echo " ***** Creating todo.log .. *****"
+	grep -r "#TODO" --exclude="todo.log"  > todo.log 
 }
 
+#finds all haskell files then executes a command that checks for errors in the code, and puts the result into error.log.
 haskellerrors(){
-	echo " ***** Putting the haskell file errors into error.log .. **********"
-	find . -name "*.hs" -exec ghc -fno-code {} \; &> error.log
+	echo " ***** Creating error.log .. *****"
+	find . -name "*.hs" -exec ghc -fno-code {} \; &> error.log 
 }
 
+# asks user which log file they want to view, depending on the options given
 openalog(){
 	read -p " Hello! Which log do you want to see? : changes, todo, or error " file 
 	if [ "$file" == "changes" ];then
@@ -42,6 +56,8 @@ openalog(){
 		echo "It was fun knowing you!"
 	fi
 }
+
+# interacts with user through asking for input. If the user does not wish to continue script, they may enter "N"
 openchat(){
 	read -p "My name's Curtis! What's your name? " name
 	echo "Hello "$name""
@@ -55,8 +71,8 @@ openchat(){
 	fi
 }
 
+# this function will run all the functions of the script
 myscript(){
-	
 	openchat
 	uptodate
 	uncommitedchanges
