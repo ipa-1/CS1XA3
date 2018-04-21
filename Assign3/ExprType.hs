@@ -15,7 +15,7 @@ Portability : POSIX
 module ExprType where
 import           Data.List
 
-{-/ Creating a Datatype with constructors that can handle basic math operations  -}
+{--| Creating a Datatype with constructors that can handle basic math operations  -}
 data Expr a = Add (Expr a) (Expr a)  -- ^ standard binary addition, between two (Expr a)
             | Mult (Expr a) (Expr a) -- ^ standard binary multiplication between two (Expr a)
             | Const a                -- ^ wrapper for a constant in the expression, or just to wrap something in the Expr datatype
@@ -28,13 +28,14 @@ data Expr a = Add (Expr a) (Expr a)  -- ^ standard binary addition, between two 
          
   deriving Eq
 
-{-/ Function getVars
+{-| Function getVars
  Takes an Expr a and returns the variables in the expression in a list
 
  This is done by throwing away the constructor and targetting the expression inside until
  the type constructor ( Var a ) is found. the "a" would be the variable we are looking for.
  The `union` function allows for concatenation (++) without duplications in the list
 -}
+
 getVars :: Expr a -> [String]
 getVars (Add e1 e2)  = getVars e1 `union` getVars e2  
 getVars (Mult e1 e2) = getVars e1 `union` getVars e2
