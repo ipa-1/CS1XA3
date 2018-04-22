@@ -8,6 +8,7 @@ Stability : experimental
 Portability : POSIX
 -}
 
+-- http://5outh.blogspot.ca/2013/05/symbolic-calculus-in-haskell.html
 
 module ExprTest where
 

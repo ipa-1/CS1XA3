@@ -39,7 +39,7 @@ class DiffExpr a where
 
 {-|
 These are the functions in the datatype DiffExpr.
-Sin,cos and log are predefined functions in prelude. e1 and e2 hold expressions so in each operation
+Sin,cos and ln are predefined functions in prelude. e1 and e2 hold expressions so in each operation
 you must evaluate the items in the operation further.
 -}
 
@@ -50,7 +50,6 @@ instance (Floating a,Integral a) => DiffExpr a where
   eval vrs (Const x) = x
   eval vrs (Sin e1) = sin (eval vrs e1)
   eval vrs (Cos e1) = cos (eval vrs e1)
-  eval vrs (Log e1 e2) = logBase e1 (eval vrs e2)
   eval vrs (Exp e1 e2) = (eval vrs e1) ^ (eval vrs e2)
   eval vrs (Ln e1) = log (eval vrs e1)
   eval vrs (Var x) = case Map.lookup x vrs of
@@ -133,25 +132,6 @@ instance (Floating a,Integral a) => DiffExpr a where
         Nothing -> Cos (Var x)
   simplify vrs (Cos e1) = Cos (simplify vrs e1)                  -- 3. Base Case
 
--- **  Log Simplification
-{- Performs the following functions:
-   1. Checks for simplification using log rules
-      a. Log of 1, regardless of base is 0
-   2. Evaluates if both are constants right away
-   3. Checks if any variables present, and evaluates if so, or else stays the same
-  4. Simplifies the expression inside if possible
--}
-
-  simplify vrs (Log _ (Const 1)) = (Const 0) -- 1.a
-  simplify vrs (Log e1 (Const b)) = Const(eval vrs (Log e1 (Const b))) -- 2. Constant
-
--- |  3.one variable in dictionary, log,
-  simplify vrs (Log e1(Var x))= case Map.lookup x vrs of 
-        Just b -> Const(eval vrs (Log e1 (Const b)))  
-        Nothing -> Log e1 (Var x)
-
-  simplify vrs (Log e1 e2) = Log e1 (simplify vrs e2)  -- 4.base case
-
 -- **  Exponent Simplification
   simplify vrs (Exp (Const(0)) e1) = Const(0)
   simplify vrs (Exp (Const(1)) e1) = Const(1)
@@ -185,7 +165,6 @@ instance (Floating a,Integral a) => DiffExpr a where
   partDiff x (Add e1 e2) = Add (partDiff x e1) (partDiff x e2)                     --  ^ derivative in addition 
   
   partDiff x (Ln e1) = Mult (Exp e1 (Const(-1))) (partDiff x e1)
-  partDiff x (Log e1 e2) = Mult (Exp (Mult e2 (Ln (Const e1)))(Const (-1))) (partDiff x e2)
 
   partDiff x (Sin e1) = Mult (Cos e1) (partDiff x e1)
   partDiff x (Cos e1) = Mult (Mult (Sin e1) (Const (-1))) (partDiff x e1)
